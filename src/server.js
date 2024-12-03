@@ -7,9 +7,10 @@ const cors = require('cors');
 // create express app
 const app = express();
 
-// Use cors and body-parser middleware for handling requests
+// Use middlewares for handling requests
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.json())
 
 
 // export app
