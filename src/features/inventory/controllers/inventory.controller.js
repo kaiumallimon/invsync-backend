@@ -175,8 +175,6 @@ exports.getAllSuppliers = async (req, res) => {
     }
 };
 
-
-
 // Controller to search suppliers by name, contactPerson, or contactEmail
 exports.searchSuppliers = async (req, res) => {
     try {
@@ -207,6 +205,43 @@ exports.searchSuppliers = async (req, res) => {
     } catch (err) {
         return res.status(500).json({
             message: err.message || "An error occurred while searching for suppliers."
+        });
+    }
+};
+
+
+// Controller to update a product by ID
+exports.updateProduct = async (req, res) => {
+    try {
+        const productId = req.params.id; // Extract product ID from URL params
+        const updatedData = req.body; // Updated product data from request body
+
+        // Check if the product exists
+        const existingProduct = await Product.findById(productId);
+        if (!existingProduct) {
+            return res.status(404).json({ message: "Product not found!" });
+        }
+
+        // Process and update image URLs if files are provided
+        if (req.files && req.files.length > 0) {
+            const serverBaseUrl = `${req.protocol}://${req.get("host")}`;
+            updatedData.images = req.files.map(file => `${serverBaseUrl}/uploads/${file.filename}`);
+        }
+
+        // Update the product with new data
+        const updatedProduct = await Product.findByIdAndUpdate(productId, updatedData, {
+            new: true, // Return the updated product document
+            runValidators: true, // Run validation rules
+        });
+
+        // Return the updated product
+        return res.status(200).json({
+            message: "Product updated successfully!",
+            product: updatedProduct,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: err.message || "An error occurred while updating the product.",
         });
     }
 };
