@@ -35,6 +35,11 @@ app.use(passport.session());
 // Connect the Express server to the database
 connectDB();
 
+
+// serve static files
+
+app.use('/uploads', express.static('uploads'));
+
 // Use the auth route
 app.use('/auth', authRoute);
 
