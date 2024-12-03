@@ -78,7 +78,7 @@ exports.register = async (req,res) => {
                 id: newUser._id,
                 name: newUser.name,
                 email: newUser.email,
-                imageUrl: newUser.email
+                imageUrl: newUser.image
             }
         })
 
@@ -101,6 +101,8 @@ exports.getUsers = async(req,res)=>{
         users.forEach(user=>{
             user.password = undefined
         })
+
+        res.status(201).json({users})
     }catch(error){
         res.status(500).json({message: error.message})
     }
