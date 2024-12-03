@@ -15,6 +15,9 @@ const upload = createUpload();
 
 router.post('/register',upload.single('profileImage'), authController.register)
 router.post('/login',authController.login)
+router.get('/users',authController.getUsers)
+router.get('/users/:id',authController.getUserById)
+
 
 
 module.exports  = router
