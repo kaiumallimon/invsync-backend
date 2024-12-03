@@ -9,10 +9,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    phone: {
-        type: String,
-        required: true
-    },
+
     email: {
         type: String,
         required: true,
@@ -35,17 +32,17 @@ const userSchema = new mongoose.Schema({
 // hash the password before saving to keep password
 // encrypted
 
-userSchema.pre('save',async function (next) {
+userSchema.pre('save', async function (next) {
     // skip hashing if the password already modified
-    if(!this.isModified('password')){
+    if (!this.isModified('password')) {
         return next()
     }
 
-    try{
+    try {
         // hash the password with bcrypt library
         this.password = await bcrypt.hash(this.password, 10)
         next()
-    }catch(error){
+    } catch (error) {
         return next(error)
     }
 })
