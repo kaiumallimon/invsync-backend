@@ -2,7 +2,8 @@
 
 const express = require('express')
 const authController = require('../controllers/auth.controller')
-const createUpload = require('../../../utils/image.upload')
+const createUpload = require('../../../utils/image.upload');
+const { route } = require('../../../server');
 
 // create a router
 const router = express.Router()
@@ -16,3 +17,4 @@ router.post('/register',upload.single('profileImage'), authController.register)
 router.post('/login',authController.login)
 
 
+module.exports  = router
