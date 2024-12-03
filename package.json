@@ -1,0 +1,22 @@
+{
+  "name": "invsync",
+  "version": "1.0.0",
+  "description": "invsync is an inventory management system, designed to help business track, manage and organize inventory effectively.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "inventory",
+    "management",
+    "stock",
+    "nodejs",
+    "mongodb",
+    "api"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "invsync": "file:"
+  }
+}
