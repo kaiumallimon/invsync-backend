@@ -1,6 +1,6 @@
-const passport = require('./../../config/passport.config')
-const User = require('./../../models/user.model')
-const createUpload = require('./../../utils/image.upload')
+const passport = require('../../../config/passport.config')
+const User = require('../../../models/user.model')
+const createUpload = require('../../../utils/image.upload')
 
 
 // controller to login a user
