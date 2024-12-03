@@ -30,6 +30,8 @@
 
 ```
 
+### Prerequisites
+- Latest version of node.js and npm installed and configured on your pc.
 
 ## Get Started
 
