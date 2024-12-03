@@ -14,5 +14,7 @@ router.get('/supplier/search', productController.searchSuppliers)
 router.get('/product/get/all', productController.getAllProducts)
 router.get('/product/search', productController.searchProducts)
 router.put('/product/update/:id', productController.updateProduct)
+router.delete('/product/delete/:id', productController.removeProduct)
+router.delete('/supplier/delete/:id', productController.removeSupplier)
 
 module.exports = router;

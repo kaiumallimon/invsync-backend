@@ -1,7 +1,8 @@
 const Product = require("../../../models/product.model");
 const Supplier = require("../../../models/supplier.model");
+const { addLog } = require("../helper/log.helper");
 
-// Controller to add a supplier
+
 exports.addSupplier = async (req, res) => {
     try {
         const { name, contactPerson, contactEmail, contactPhone, address, website } = req.body;
@@ -25,6 +26,9 @@ exports.addSupplier = async (req, res) => {
         // Save to MongoDB
         await newSupplier.save();
 
+        // Add log entry
+        await addLog("Add Supplier", newSupplier);
+
         // Return a success response
         return res.status(201).json({
             message: "Supplier added successfully!",
@@ -35,7 +39,6 @@ exports.addSupplier = async (req, res) => {
     }
 };
 
-// Controller to add a product
 exports.addProduct = async (req, res) => {
     try {
         const { name, category, brand, sku, quantityInStock, price, supplier, warrantyPeriod, condition, specifications } = req.body;
@@ -69,6 +72,9 @@ exports.addProduct = async (req, res) => {
 
         // Save to MongoDB
         await newProduct.save();
+
+        // Add log entry
+        await addLog("Add Product", newProduct);
 
         // Return a success response
         return res.status(201).json({
@@ -210,11 +216,94 @@ exports.searchSuppliers = async (req, res) => {
 };
 
 
-// Controller to update a product by ID
 exports.updateProduct = async (req, res) => {
     try {
-        const productId = req.params.id; // Extract product ID from URL params
-        const updatedData = req.body; // Updated product data from request body
+        const { name, category, brand, sku, quantityInStock, price, supplier, warrantyPeriod, condition, specifications } = req.body;
+
+        // Find the existing product
+        const existingProduct = await Product.findById(req.params.id);
+        if (!existingProduct) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        // Prepare an object to hold the updates
+        const updateData = {};
+
+        // Conditionally add fields to update only if they are provided
+        if (name) updateData.name = name;
+        if (category) updateData.category = category;
+        if (brand) updateData.brand = brand;
+        if (sku) updateData.sku = sku;
+        if (quantityInStock) updateData.quantityInStock = quantityInStock;
+        if (price) updateData.price = price;
+        if (supplier) updateData.supplier = supplier;
+        if (warrantyPeriod) updateData.warrantyPeriod = warrantyPeriod;
+        if (condition) updateData.condition = condition;
+        if (specifications) updateData.specifications = specifications;
+
+        // Handle images if files are provided
+        if (req.files && req.files.length > 0) {
+            const serverBaseUrl = `${req.protocol}://${req.get("host")}`;
+            const newImages = req.files.map(file => `${serverBaseUrl}/uploads/${file.filename}`);
+            updateData.images = newImages;
+        }
+
+        // Update the product with the new data
+        const updatedProduct = await Product.findByIdAndUpdate(
+            req.params.id,
+            { $set: updateData }, // Only update provided fields
+            { new: true, runValidators: true } // Return updated product and validate fields
+        );
+
+        if (!updatedProduct) {
+            return res.status(500).json({ message: "Failed to update the product." });
+        }
+
+        // Return the updated product
+        res.status(200).json({
+            message: "Product updated successfully!",
+            product: updatedProduct,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "An error occurred while updating the product." });
+    }
+};
+
+
+// Controller to remove a supplier by ID
+
+exports.removeSupplier = async (req, res) => {
+    try {
+        const supplierId = req.params.id; // Extract supplier ID from the URL parameters
+
+        // Check if the supplier exists
+        const existingSupplier = await Supplier.findById(supplierId);
+        if (!existingSupplier) {
+            return res.status(404).json({ message: "Supplier not found!" });
+        }
+
+        // Remove the supplier
+        await Supplier.findByIdAndDelete(supplierId);
+
+        // Add log entry
+        await addLog("Remove Supplier", existingSupplier);
+
+        // Return a success response
+        return res.status(200).json({
+            message: "Supplier removed successfully!",
+            supplier: existingSupplier,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || "An error occurred while removing the supplier." });
+    }
+};
+
+
+
+// Controller to remove a product by ID
+exports.removeProduct = async (req, res) => {
+    try {
+        const productId = req.params.id; // Extract product ID from the URL parameters
 
         // Check if the product exists
         const existingProduct = await Product.findById(productId);
@@ -222,26 +311,18 @@ exports.updateProduct = async (req, res) => {
             return res.status(404).json({ message: "Product not found!" });
         }
 
-        // Process and update image URLs if files are provided
-        if (req.files && req.files.length > 0) {
-            const serverBaseUrl = `${req.protocol}://${req.get("host")}`;
-            updatedData.images = req.files.map(file => `${serverBaseUrl}/uploads/${file.filename}`);
-        }
+        // Remove the product
+        await Product.findByIdAndDelete(productId);
 
-        // Update the product with new data
-        const updatedProduct = await Product.findByIdAndUpdate(productId, updatedData, {
-            new: true, // Return the updated product document
-            runValidators: true, // Run validation rules
-        });
+        // Add log entry
+        await addLog("Remove Product", existingProduct);
 
-        // Return the updated product
+        // Return a success response
         return res.status(200).json({
-            message: "Product updated successfully!",
-            product: updatedProduct,
+            message: "Product removed successfully!",
+            product: existingProduct,
         });
-    } catch (err) {
-        return res.status(500).json({
-            message: err.message || "An error occurred while updating the product.",
-        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || "An error occurred while removing the product." });
     }
 };
