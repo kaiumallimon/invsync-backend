@@ -10,8 +10,6 @@ const app = express();
 // Use middlewares for handling requests
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.json())
-
 
 // export app
 module.exports = app;

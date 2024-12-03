@@ -12,22 +12,31 @@ const path = require('path')
 require('dotenv').config
 
 // get port from .env file
-const PORT = procces.env.PORT || 3000
+const PORT = process.env.PORT || 3000
+
+
+app.use(express.json())
+
 
 
 // use session
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false
-}))
+app.use(
+    session({
+      secret: process.env.SESSION_SECRET || 'defaultsecret',
+      resave: false,
+      saveUninitialized: false,
+    })
+  );
 
-// connect the experess server to database
-connectDB()
-
-// use the auth route
-app.use('/auth', authRoute)
-
+  app.use(passport.initialize());
+  app.use(passport.session());
+  
+  // Connect the Express server to the database
+  connectDB();
+  
+  // Use the auth route
+  app.use('/auth', authRoute);
+  
 
 // start the server
 
